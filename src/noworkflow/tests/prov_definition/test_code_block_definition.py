@@ -363,3 +363,19 @@ class TestCodeBlockDefinition(CollectionTestCase):
                          "    pass")
         self.assertEqual(class_def_block.docstring, "cdoc")
         self.assertTrue(bool(class_def_block.code_hash))
+
+    def test_yield_named_expression_fallback_component(self):
+        """Create a fallback component for a named expression inside yield."""
+        self.script(
+            "# script.py\n"
+            "def generator():\n"
+            "    yield (value := 1)\n"
+        )
+
+        self.compile()
+
+        component = self.find_code_component(name="(value := 1)")
+
+        self.assertIsNotNone(component)
+        self.assertEqual(component.type, "item")
+        self.assertEqual(component.mode, "r")

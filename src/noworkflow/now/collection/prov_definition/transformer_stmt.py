@@ -64,8 +64,9 @@ class RewriteAST(ast.NodeTransformer):
             return ast_num(citem.code_component_id)
         elif fallback:
             name = pyposast.extract_code(self.lcode, node)
+            node.name = name
             id_ = self.create_code_component(
-                node, name, mode
+                node, node_type, mode
             )
             self.create_composition(id_, *self.composition_edge)
             return ast_num(id_)
