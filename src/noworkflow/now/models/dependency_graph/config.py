@@ -182,7 +182,7 @@ class DependencyConfig(object):
         if not self.show_internals:
             filters.append(FilterInternalsOut())
         if self.show_only_was_derived_from:
-            filters.append(FilterWasDerivedFrom(self.show_only_was_derived_from_eid, self.show_only_was_derived_from_trial))
+            filters.append(FilterWasDerivedFrom(self.show_only_was_derived_from_eid, self.show_only_was_derived_from_trial, self.mode))
         if self.hide_not_code:
             filters.append(FilterNotFromCodeOut())
         if self.activation_names:

@@ -13,7 +13,7 @@ from ...persistence import relational
 from  ...cmd.cmd_evaluation import query_evaluations, Evaluation as EvaluationPrint
 
 from .node_types import AccessNode, ClusterNode
-from .node_types import EvaluationNode
+from .node_types import EvaluationNode, ActivationNode
 
 
 class Filter(object):
@@ -130,12 +130,22 @@ class FilterWasDerivedFrom(AcceptAllNodesFilter):
     """Filter that accepts only one evaluation and the ones that derived it"""
     # pylint: disable=too-few-public-methods
     was_derived_from_list = None
-    def __init__(self, eid, trial):
+    def __init__(self, eid, trial, mode):
+        self.mode=mode
         if self.was_derived_from_list is None:
             # TODO This class is being disnecessarily instantiated twice
             self.was_derived_from_list = self.get_was_derived_from_list(eid, trial)
         
     def __contains__(self, node):
+        if isinstance(node, ActivationNode):
+            if node.evaluation in self.was_derived_from_list:
+                return True
+            if self.mode in ["looplessCoarseGrain", "coarseGrain"]:
+                return False
+            return any(
+                evaluation in self.was_derived_from_list
+                for evaluation in node.activation.evaluations
+            )
         if isinstance(node, EvaluationNode):
             return not node.evaluation not in self.was_derived_from_list
         return super(FilterWasDerivedFrom, self).__contains__(node)
